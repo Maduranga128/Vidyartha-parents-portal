@@ -16,9 +16,9 @@
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 14px; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
         .hidden { display: none; }
-        .result-card { background: #fff; padding: 15px; margin-top: 15px; border: 1px solid #eee; border-left: 6px solid #34a853; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.6; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; float: right; font-weight: bold; }
-        .data-label { font-weight: bold; color: #1a73e8; width: 110px; display: inline-block; }
+        .result-card { background: #fff; padding: 15px; margin-top: 15px; border: 1px solid #eee; border-left: 6px solid #34a853; border-radius: 8px; font-size: 15px; position: relative; line-height: 1.8; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; float: right; font-weight: bold; font-size: 12px; }
+        .data-label { font-weight: bold; color: #1a73e8; width: 125px; display: inline-block; }
         .logout-btn { background: #6c757d; margin-top: 20px; }
     </style>
 </head>
@@ -36,7 +36,7 @@
     <div id="addForm">
         <h3>දත්ත ඇතුළත් කරන්න</h3>
         <input type="text" id="studentName" placeholder="ළමයාගේ නම">
-        <input type="text" id="studentClass" placeholder="පන්තිය">
+        <input type="text" id="studentClass" placeholder="පන්තිය (උදා: 10-B)">
         <input type="text" id="parentName" placeholder="දෙමාපියන්ගේ නම">
         <input type="text" id="job" placeholder="රැකියාව">
         <textarea id="support" placeholder="ලබාදිය හැකි සහයයන්"></textarea>
@@ -48,7 +48,7 @@
     <div class="search-section" style="margin-top:20px; border-top: 2px solid #eee; padding-top:10px;">
         <h3>සොයන්න</h3>
         <select id="searchType">
-            <option value="studentName">නම අනුව</option>
+            <option value="studentName">ළමයාගේ නම අනුව</option>
             <option value="job">රැකියාව අනුව</option>
             <option value="studentClass">පන්තිය අනුව</option>
         </select>
@@ -91,7 +91,10 @@
     const sName = document.getElementById("studentName").value.trim();
     const sClass = document.getElementById("studentClass").value.trim();
     const pName = document.getElementById("parentName").value.trim();
+    const job = document.getElementById("job").value.trim();
+    const support = document.getElementById("support").value.trim();
     const phone = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
 
     if (!sName || !phone) { alert("නම සහ දුරකථන අංකය අනිවාර්යයි!"); return; }
 
@@ -101,18 +104,21 @@
     try {
         const q = query(collection(db, "parents"), where("studentName", "==", sName), where("studentClass", "==", sClass));
         const check = await getDocs(q);
-        if (!check.empty) { alert("මෙම දත්තය දැනටමත් ඇත!"); saveBtn.disabled = false; return; }
+        if (!check.empty) { alert("මෙම දත්තය දැනටමත් පද්ධතියේ ඇත!"); saveBtn.disabled = false; return; }
 
         await addDoc(collection(db, "parents"), {
-            studentName: sName, studentClass: sClass, parentName: pName,
-            job: document.getElementById("job").value.trim(),
-            support: document.getElementById("support").value.trim(),
-            phone: phone, address: document.getElementById("address").value.trim(),
+            studentName: sName,
+            studentClass: sClass,
+            parentName: pName,
+            job: job,
+            support: support,
+            phone: phone,
+            address: address,
             timestamp: new Date()
         });
         alert("සාර්ථකව සුරැකුණා!");
         document.querySelectorAll("#addForm input, #addForm textarea").forEach(el => el.value = "");
-    } catch(e) { alert(e.message); } finally { saveBtn.disabled = false; }
+    } catch(e) { alert("Error: " + e.message); } finally { saveBtn.disabled = false; }
   };
 
   window.searchParent = async () => {
@@ -125,19 +131,20 @@
     try {
         const q = query(collection(db, "parents"), where(type, ">=", text), where(type, "<=", text + '\\uf8ff'));
         const snap = await getDocs(q);
+        
         snap.forEach((docRef) => {
             const d = docRef.data();
             const id = docRef.id;
             resDiv.innerHTML += `
                 <div class="result-card" id="card-${id}">
                     <button class="delete-btn" onclick="deleteEntry('${id}')">Delete</button>
-                    <p><span class="data-label">ළමයා:</span> ${d.studentName}</p>
-                    <p><span class="data-label">පන්තිය:</span> ${d.studentClass}</p>
-                    <p><span class="data-label">මව්පිය නම:</span> ${d.parentName}</p>
-                    <p><span class="data-label">රැකියාව:</span> ${d.job}</p>
-                    <p><span class="data-label">සහයයන්:</span> ${d.support || '-'}</p>
-                    <p><span class="data-label">දුරකථන:</span> ${d.phone}</p>
-                    <p><span class="data-label">ලිපිනය:</span> ${d.address || '-'}</p>
+                    <div><span class="data-label">ළමයාගේ නම:</span> ${d.studentName || '-'}</div>
+                    <div><span class="data-label">පන්තිය:</span> ${d.studentClass || '-'}</div>
+                    <div><span class="data-label">මව්පිය නම:</span> ${d.parentName || '-'}</div>
+                    <div><span class="data-label">රැකියාව:</span> ${d.job || '-'}</div>
+                    <div><span class="data-label">සහයයන්:</span> ${d.support || '-'}</div>
+                    <div><span class="data-label">දුරකථන:</span> ${d.phone || '-'}</div>
+                    <div><span class="data-label">ලිපිනය:</span> ${d.address || '-'}</div>
                 </div>`;
         });
     } catch(e) { console.error(e); }
@@ -145,9 +152,11 @@
 
   window.deleteEntry = async (id) => {
     if (confirm("මෙම දත්තය මකා දැමීමට ඔබට විශ්වාසද?")) {
-        await deleteDoc(doc(db, "parents", id));
-        document.getElementById("card-"+id).remove();
-        alert("මකා දැමීම සාර්ථකයි!");
+        try {
+            await deleteDoc(doc(db, "parents", id));
+            document.getElementById("card-"+id).remove();
+            alert("සාර්ථකව මකා දැමුවා!");
+        } catch(e) { alert("Error: " + e.message); }
     }
   };
 </script>

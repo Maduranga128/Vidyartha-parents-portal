@@ -5,19 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vidyartha Parents Portal</title>
     
-   <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Vidyartha%20Portal%22,%22short_name%22:%22Vidyartha%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#ffffff%22,%22theme_color%22:%22#1a73e8%22,%22icons%22:[{%22src%22:%22https://raw.githubusercontent.com/vidyartha-parents/assets/main/logo.jpeg%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]} ">
+    <link rel="manifest" href="data:application/manifest+json,{%22name%22:%22Vidyartha%20Portal%22,%22short_name%22:%22Vidyartha%22,%22start_url%22:%22index.html%22,%22display%22:%22standalone%22,%22background_color%22:%22#ffffff%22,%22theme_color%22:%22#1a73e8%22,%22icons%22:[{%22src%22:%22https://raw.githubusercontent.com/vidyartha-parents/assets/main/logo.jpg%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]} ">
     <meta name="theme-color" content="#1a73e8">
     <meta name="mobile-web-app-capable" content="yes">
 
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f0f4f8; margin: 0; padding: 10px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 500px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 6px solid #1a73e8; }
+        .container { width: 100%; max-width: 550px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 6px solid #1a73e8; }
         h2, h3 { text-align: center; color: #1a73e8; margin-bottom: 15px; }
         input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         button { width: 100%; padding: 14px; background: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
         .hidden { display: none; }
-        .result-card { background: #fff; padding: 15px; margin-top: 15px; border: 1px solid #eee; border-left: 6px solid #34a853; border-radius: 8px; font-size: 14px; position: relative; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px; border-radius: 4px; float: right; }
+        .result-card { background: #fff; padding: 15px; margin-top: 15px; border: 1px solid #eee; border-left: 6px solid #34a853; border-radius: 8px; font-size: 14px; position: relative; line-height: 1.6; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 5px; float: right; font-weight: bold; }
+        .data-label { font-weight: bold; color: #1a73e8; width: 110px; display: inline-block; }
         .logout-btn { background: #6c757d; margin-top: 20px; }
     </style>
 </head>
@@ -33,6 +34,7 @@
 <div id="mainApp" class="container hidden">
     <h2>Parents Portal</h2>
     <div id="addForm">
+        <h3>දත්ත ඇතුළත් කරන්න</h3>
         <input type="text" id="studentName" placeholder="ළමයාගේ නම">
         <input type="text" id="studentClass" placeholder="පන්තිය">
         <input type="text" id="parentName" placeholder="දෙමාපියන්ගේ නම">
@@ -43,14 +45,14 @@
         <button id="saveBtn" onclick="saveParentData()">Save to Cloud</button>
     </div>
 
-    <div class="search-section" style="margin-top:20px; border-top: 1px solid #eee; padding-top:10px;">
-        <h3>Search</h3>
+    <div class="search-section" style="margin-top:20px; border-top: 2px solid #eee; padding-top:10px;">
+        <h3>සොයන්න</h3>
         <select id="searchType">
             <option value="studentName">නම අනුව</option>
             <option value="job">රැකියාව අනුව</option>
             <option value="studentClass">පන්තිය අනුව</option>
         </select>
-        <input type="text" id="searchInput" placeholder="Search here..." onkeyup="searchParent()">
+        <input type="text" id="searchInput" placeholder="මෙහි ටයිප් කරන්න..." onkeyup="searchParent()">
         <div id="searchResults"></div>
     </div>
     <button class="logout-btn" onclick="logout()">Logout</button>
@@ -72,7 +74,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Service Worker Register
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').then(() => console.log("SW Registered"));
   }
@@ -81,7 +82,7 @@
     if (document.getElementById("username").value === "vidyartha" && document.getElementById("password").value === "19460101") {
         document.getElementById("loginPage").classList.add("hidden");
         document.getElementById("mainApp").classList.remove("hidden");
-    } else { alert("Login Failed!"); }
+    } else { alert("මුරපදය වැරදියි!"); }
   };
 
   window.logout = () => { location.reload(); };
@@ -92,7 +93,7 @@
     const pName = document.getElementById("parentName").value.trim();
     const phone = document.getElementById("phone").value.trim();
 
-    if (!sName || !phone) { alert("නම සහ දුරකථන අංකය ඕනෙමයි!"); return; }
+    if (!sName || !phone) { alert("නම සහ දුරකථන අංකය අනිවාර්යයි!"); return; }
 
     const saveBtn = document.getElementById("saveBtn");
     saveBtn.disabled = true;
@@ -100,7 +101,7 @@
     try {
         const q = query(collection(db, "parents"), where("studentName", "==", sName), where("studentClass", "==", sClass));
         const check = await getDocs(q);
-        if (!check.empty) { alert("දැනටමත් ඇතුළත් කර ඇත!"); saveBtn.disabled = false; return; }
+        if (!check.empty) { alert("මෙම දත්තය දැනටමත් ඇත!"); saveBtn.disabled = false; return; }
 
         await addDoc(collection(db, "parents"), {
             studentName: sName, studentClass: sClass, parentName: pName,
@@ -121,23 +122,32 @@
     resDiv.innerHTML = "";
     if (text.length < 1) return;
 
-    const q = query(collection(db, "parents"), where(type, ">=", text), where(type, "<=", text + '\\uf8ff'));
-    const snap = await getDocs(q);
-    snap.forEach((docRef) => {
-        const d = docRef.data();
-        resDiv.innerHTML += `<div class="result-card" id="card-${docRef.id}">
-            <button class="delete-btn" onclick="deleteEntry('${docRef.id}')">Delete</button>
-            <p><b>${d.studentName}</b> (${d.studentClass})</p>
-            <p>${d.parentName} - ${d.job}</p>
-            <p>Tel: ${d.phone}</p>
-        </div>`;
-    });
+    try {
+        const q = query(collection(db, "parents"), where(type, ">=", text), where(type, "<=", text + '\\uf8ff'));
+        const snap = await getDocs(q);
+        snap.forEach((docRef) => {
+            const d = docRef.data();
+            const id = docRef.id;
+            resDiv.innerHTML += `
+                <div class="result-card" id="card-${id}">
+                    <button class="delete-btn" onclick="deleteEntry('${id}')">Delete</button>
+                    <p><span class="data-label">ළමයා:</span> ${d.studentName}</p>
+                    <p><span class="data-label">පන්තිය:</span> ${d.studentClass}</p>
+                    <p><span class="data-label">මව්පිය නම:</span> ${d.parentName}</p>
+                    <p><span class="data-label">රැකියාව:</span> ${d.job}</p>
+                    <p><span class="data-label">සහයයන්:</span> ${d.support || '-'}</p>
+                    <p><span class="data-label">දුරකථන:</span> ${d.phone}</p>
+                    <p><span class="data-label">ලිපිනය:</span> ${d.address || '-'}</p>
+                </div>`;
+        });
+    } catch(e) { console.error(e); }
   };
 
   window.deleteEntry = async (id) => {
-    if (confirm("Delete this?")) {
+    if (confirm("මෙම දත්තය මකා දැමීමට ඔබට විශ්වාසද?")) {
         await deleteDoc(doc(db, "parents", id));
         document.getElementById("card-"+id).remove();
+        alert("මකා දැමීම සාර්ථකයි!");
     }
   };
 </script>
